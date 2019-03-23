@@ -6,7 +6,6 @@ const fs = require('fs');
 
 const port = process.env.PORT || 8081;
 
-// define Express app
 // define the Express app
 const app = express();
 
