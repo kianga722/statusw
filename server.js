@@ -2,7 +2,8 @@
 const express = require('express');
 const axios = require('axios');
 const path = require('path');
-const fs = require('fs');
+// const fs = require('fs');
+require('dotenv').config();
 
 const port = process.env.PORT || 8081;
 
@@ -11,7 +12,8 @@ const app = express();
 
 // define Twitch variables
 // Read client ID from environment or from file
-let clientId = process.env.twitchID;
+const clientId = process.env.twitchID;
+/*
 if (!clientId) {
   try {
     clientId = fs.readFileSync('twitchID.txt', 'utf8');
@@ -19,6 +21,7 @@ if (!clientId) {
     console.log('Error:', e.stack);
   }
 }
+*/
 
 const helix = axios.create({
   baseURL: 'https://api.twitch.tv/helix/',
