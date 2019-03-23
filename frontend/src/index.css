@@ -1,0 +1,174 @@
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+  vertical-align: baseline;
+  box-sizing: border-box;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/*
+Fonts
+*/
+
+body {
+  margin: .25rem .5rem;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/*
+BG Color
+*/
+
+html {
+  background-color: #cccccc24;
+}
+
+/*
+Links
+*/
+
+a {
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.App {
+  display: grid;
+}
+
+.title-wrapper {
+  display: grid;
+  justify-items: center;
+  padding: 1rem;
+  font-size: 3rem;
+}
+
+.title-top:hover {
+  text-shadow: 0 0 3px green;
+  cursor: pointer;
+}
+
+.statusBox {
+  display: grid;
+  justify-items: center;
+  padding-top: 1rem;
+  padding-bottom: 3rem;
+}
+
+.statusLine {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: .5rem;
+  border-top: 1px solid blue;
+  border-left: 1px solid blue;
+  border-right: 1px solid blue;
+}
+
+.statusLine:last-child {
+  border-bottom: 1px solid blue;
+}
+
+.statusLine:hover {
+  background-color: #bcffbc;
+}
+
+.live, .offline {
+  display: flex;
+  justify-content: center;
+}
+
+.live {
+  color:red;
+}
+
+.offline {
+  color: gray;
+}
+
+.streams {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-template-rows: repeat(auto-fill, minmax(300px, 1fr));
+  grid-gap: 1rem;
+}
+
+iframe {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+}
+
+
+/*
+Media Queries
+*/
+
+@media (max-width: 869px) {
+
+  .streams {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    padding: 0 8rem;
+  }
+
+  iframe {
+
+  }
+
+}
+
+@media (max-width: 669px) {
+
+  .streams {
+    padding: 0;
+  }
+
+}

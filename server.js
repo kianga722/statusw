@@ -41,7 +41,7 @@ streamers.map((s) => {
   }
 });
 
-// retrieve list of streamerss
+// retrieve list of streamers
 app.get('/api/', (req, res) => {
   helix.get(streamersURL)
     .then((streams) => {
