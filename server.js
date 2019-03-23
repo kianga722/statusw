@@ -10,12 +10,14 @@ const port = process.env.PORT || 8081;
 const app = express();
 
 // define Twitch variables
-let clientId;
-// Read token from token file
-try {
-  clientId = fs.readFileSync('token.txt', 'utf8');
-} catch (e) {
-  console.log('Error:', e.stack);
+// Read client ID from environment or from file
+let clientId = process.env.twitchID;
+if (!clientId) {
+  try {
+    clientId = fs.readFileSync('twitchID.txt', 'utf8');
+  } catch (e) {
+    console.log('Error:', e.stack);
+  }
 }
 
 const helix = axios.create({
