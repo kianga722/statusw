@@ -1,4 +1,4 @@
-# statusw
+# statusW
 This project aims to display the online status of a selected subset of Twitch streamers
 
 [View App](https://statuspog.herokuapp.com/)
