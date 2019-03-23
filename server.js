@@ -2,6 +2,7 @@
 const express = require('express');
 const axios = require('axios');
 const path = require('path');
+const fs = require('fs');
 
 const port = process.env.PORT || 8081;
 
@@ -10,7 +11,13 @@ const port = process.env.PORT || 8081;
 const app = express();
 
 // define Twitch variables
-const clientId = '6td2aro2su4uj0vyw04mvcgz2a95et';
+let clientId;
+// Read token from token file
+try {
+  clientId = fs.readFileSync('token.txt', 'utf8');
+} catch (e) {
+  console.log('Error:', e.stack);
+}
 
 const helix = axios.create({
   baseURL: 'https://api.twitch.tv/helix/',
