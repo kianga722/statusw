@@ -3,22 +3,28 @@ import React, { Component } from 'react';
 class Streams extends Component {
   render() {
     return (
-      <div className='streams'>
+      <div className='streams-wrapper'>
         {
           this.props.active === null
-          && <p>Loading streams...</p>
+          && <div className='loading'>
+              <div class="lds-ripple"><div></div><div></div></div>
+             </div>
         }
         {
           this.props.active
-          && this.props.active.map((s) => (
-            <div key={s}>
-              <iframe
-                title={`${s}-iframe`}
-                src={`https://player.twitch.tv/?channel=${s}&autoplay=false`}
-              >
-              </iframe>
-            </div>
-          ))
+          && <div className='streams'>
+            {
+              this.props.active.map((s) => (
+                <div key={s}>
+                  <iframe
+                    title={`${s}-iframe`}
+                    src={`https://player.twitch.tv/?channel=${s}&autoplay=false`}
+                  >
+                  </iframe>
+                </div>
+              ))
+            }
+          </div>
         }
       </div>
     )

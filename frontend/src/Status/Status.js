@@ -6,7 +6,7 @@ class Status extends Component {
       <div className='statusBox'>
         {
           this.props.status === null
-          && <div className='loading'>Loading stream status...</div>
+          && <div className='loading'>Loading streamer status...</div>
         }
         {
           this.props.status
