@@ -3,7 +3,9 @@ const express = require('express');
 const axios = require('axios');
 const path = require('path');
 // const fs = require('fs');
-require('dotenv').config();
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
 
 const port = process.env.PORT || 8081;
 
