@@ -1,6 +1,5 @@
 // import dependencies
 const express = require('express');
-const cors = require('cors');
 const axios = require('axios');
 const path = require('path');
 
@@ -9,9 +8,6 @@ const port = process.env.PORT || 8081;
 // define Express app
 // define the Express app
 const app = express();
-
-// enable all CORS requests
-app.use(cors());
 
 // define Twitch variables
 const clientId = '6td2aro2su4uj0vyw04mvcgz2a95et';
