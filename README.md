@@ -3,6 +3,8 @@ This project aims to display the online status of a selected subset of Twitch st
 
 [View App](https://statuspog.herokuapp.com/)
 
+![screenshot](https://github.com/kianga722/statusw/blob/master/screenshot.png)
+
 ## Summary
 
 * Motivation was to develop skills using React, Express, and CSS Grid
