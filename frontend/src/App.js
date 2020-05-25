@@ -28,7 +28,7 @@ class App extends Component {
       this.setState({
         status: update.streamersLive
       });
-    }, 15000)
+    }, 60000)
   }
 
   render() {

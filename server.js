@@ -12,35 +12,41 @@ const port = process.env.PORT || 8081;
 // define the Express app
 const app = express();
 
-// define Twitch variables
-// Read client ID from environment or from file
-const clientId = process.env.twitchID;
-/*
-if (!clientId) {
-  try {
-    clientId = fs.readFileSync('twitchID.txt', 'utf8');
-  } catch (e) {
-    console.log('Error:', e.stack);
-  }
-}
-*/
+// Twitch variables
+const clientId = process.env.TWITCH_CLIENT;
+const clientSecret = process.env.TWITCH_SECRET; 
 
-const helix = axios.create({
-  baseURL: 'https://api.twitch.tv/helix/',
-  headers: { 'Client-ID': clientId },
-});
+// your application requests authorization
+const authOptions = {
+  url: 'https://id.twitch.tv/oauth2/token',
+  method: 'post',
+  params: {
+    client_id: clientId,
+    client_secret: clientSecret,
+    grant_type: 'client_credentials',
+  },
+  headers: {
+    'Accept':'application/json',
+    'Content-Type': 'application/x-www-form-urlencoded'
+  }
+};
+
 
 // list of streamers to check status of
 const streamers = [
   'avoidingthepuddle',
+  'esfandtv',
   'fistpumpdude',
+  'fl0m',
+  'hasanabi',
+  'lirik',
   'mang0',
-  'overwatchleague',
+  'mizkif',
   'rajjpatel',
   'twitchpresents',
   'xqcow',
 ];
-// create Twitch URL query
+// create Twitch URL query to append at end
 let streamersURL = 'streams?';
 streamers.map((s) => {
   if (s === streamers[streamers.length - 1]) {
@@ -51,35 +57,47 @@ streamers.map((s) => {
 });
 
 // retrieve list of streamers
-app.get('/api/', (req, res) => {
-  helix.get(streamersURL)
-    .then((streams) => {
-      // initialize status hash and active array
-      const streamersLive = {};
-      const active = [];
-      streamers.map((s) => {
-        // all streamers in hash offline initially
-        streamersLive[s] = false;
-      });
-      // map online streamers status to true
-      streams.data.data.map((d) => {
-        const streamer = d.user_name.toLowerCase();
-        streamersLive[`${streamer}`] = true;
-        // create array of active streamers
-        active.push(streamer);
-      });
-      // send streamer status and active ones back
-      res.send({
-        streamersLive,
-        active: active.sort(),
-      });
-    })
-    .catch((error) => {
-      res.send({
-        status: '500',
-        message: error,
-      });
+app.get('/api/', async (req, res) => {
+  const responseToken = await axios(authOptions)
+  const token = responseToken.data['access_token']
+
+  // Prepare Twitch request
+  let twitchResponse = await axios({
+    url: `https://api.twitch.tv/helix/${streamersURL}
+    `,
+    method: 'get',
+    headers: {
+      'Accept':'application/json',
+      'Content-Type': 'application/json',
+      'Client-ID': clientId,
+      'Authorization': 'Bearer ' + token
+    },
+  })
+
+  try {
+    // initialize status hash and active array
+    const streamersLive = {};
+    const active = [];
+    streamers.map((s) => {
+      // all streamers in hash offline initially
+      streamersLive[s] = false;
     });
+    // map online streamers status to true
+    twitchResponse.data.data.map((d) => {
+      const streamer = d.user_name.toLowerCase();
+      streamersLive[`${streamer}`] = true;
+      // create array of active streamers
+      active.push(streamer);
+    });
+    // send streamer status and active ones back
+    res.send({
+      streamersLive,
+      active: active.sort(),
+    });
+  } catch(error) {
+    return res.status(500).send(error);
+  }
+
 });
 
 
