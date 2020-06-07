@@ -7,7 +7,7 @@ class Streams extends Component {
         {
           this.props.active === null
           && <div className='loading'>
-              <div class="lds-ripple"><div></div><div></div></div>
+              <div className="lds-ripple"><div></div><div></div></div>
              </div>
         }
         {

@@ -3,8 +3,8 @@ import React, { Component } from 'react';
 class Title extends Component {
   render() {
     return (
-      <div class='title-wrapper'>
-        <a class='title-top' href='/'>statusW</a>
+      <div className='title-wrapper'>
+        <a className='title-top' href='/'>statusW</a>
       </div>
     )
   }

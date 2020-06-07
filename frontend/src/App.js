@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
+import socketIOClient from 'socket.io-client';
 import axios from 'axios';
+
 import Title from './Title/Title'
 import Status from './Status/Status'
 import Streams from './Streams/Streams'
@@ -14,21 +16,33 @@ class App extends Component {
     };
   }
 
+  getActiveStreamers = streamersLive => {
+    return Object.keys(streamersLive).filter(d => {
+      return streamersLive[d]
+    })
+  }
+
   // initial stream status checkd
   async componentDidMount() {
-    const dataTwitch = (await axios.get('/api/')).data;
+    const dataTwitch = (await axios.get('/init')).data;
+    const active = this.getActiveStreamers(dataTwitch.streamersLive)
     this.setState({
       status: dataTwitch.streamersLive,
-      active: dataTwitch.active
+      active
     });
 
-    // update stream status at regular intervals
-    setInterval(async () => {
-      const update = (await axios.get('/api/')).data;
-      this.setState({
-        status: update.streamersLive
-      });
-    }, 60000)
+    const socket = socketIOClient('/');
+
+    socket.on('broadcast', async data => {
+      if (data === 'update') {
+        console.log('Updating Stream Status')
+        const update = (await axios.get('/getStreamers')).data;
+        this.setState({
+          status: update.streamersLive
+        });
+      }
+    })
+
   }
 
   render() {
