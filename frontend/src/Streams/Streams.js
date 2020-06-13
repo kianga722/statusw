@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 
 class Streams extends Component {
   render() {
+    const parent = 'statuspog.herokuapp.com';
+    
     return (
       <div className='streams-wrapper'>
         {
@@ -18,7 +20,7 @@ class Streams extends Component {
                 <div key={s}>
                   <iframe
                     title={`${s}-iframe`}
-                    src={`https://player.twitch.tv/?channel=${s}&autoplay=false`}
+                    src={`https://player.twitch.tv/?channel=${s}&parent=${parent}&autoplay=false`}
                   >
                   </iframe>
                 </div>
