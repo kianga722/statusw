@@ -96,6 +96,7 @@ const getOAuth = async () => {
 }
 
 const streamerMap = {
+  'AustinShow': 40197643,
   'AvoidingThePuddle': 23528098,
   'EsfandTV': 38746172,
   'fistpumpdude': 408754253,
@@ -104,7 +105,6 @@ const streamerMap = {
   'LIRIK': 23161357,
   'mang0': 26551727,
   'Mizkif': 94753024,
-  'RajjPatel': 40197643,
   'TwitchPresents': 149747285,
   'xQcOW': 71092938
 }
