@@ -103,8 +103,10 @@ const streamerMap = {
   'fl0m': 25093116,
   'HasanAbi': 207813352,
   'LIRIK': 23161357,
+  'Leffen': 53831525,
   'mang0': 26551727,
   'Mizkif': 94753024,
+  'n0ne': 80615421,
   'TwitchPresents': 149747285,
   'xQcOW': 71092938
 }

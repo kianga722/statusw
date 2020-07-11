@@ -267,6 +267,9 @@ Main Layout
 .statusLine .channelInfo > div {
   margin-bottom: 10px;
 }
+.statusLine .channelTitle {
+  word-break: break-word;
+}
 
 .statusLine:last-child {
   border-bottom: 1px solid blue;
