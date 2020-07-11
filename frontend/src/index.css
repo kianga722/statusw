@@ -3,49 +3,130 @@
    License: none (public domain)
 */
 
-html, body, div, span, applet, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-a, abbr, acronym, address, big, cite, code,
-del, dfn, em, img, ins, kbd, q, s, samp,
-small, strike, strong, sub, sup, tt, var,
-b, u, i, center,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, embed, 
-figure, figcaption, footer, header, hgroup, 
-menu, nav, output, ruby, section, summary,
-time, mark, audio, video {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	font-size: 100%;
-	font: inherit;
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
   vertical-align: baseline;
   box-sizing: border-box;
 }
 /* HTML5 display-role reset for older browsers */
-article, aside, details, figcaption, figure, 
-footer, header, hgroup, menu, nav, section {
-	display: block;
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
 }
 body {
-	line-height: 1;
+  line-height: 1;
 }
-ol, ul {
-	list-style: none;
+ol,
+ul {
+  list-style: none;
 }
-blockquote, q {
-	quotes: none;
+blockquote,
+q {
+  quotes: none;
 }
-blockquote:before, blockquote:after,
-q:before, q:after {
-	content: '';
-	content: none;
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: '';
+  content: none;
 }
 table {
-	border-collapse: collapse;
-	border-spacing: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
 }
 
 /*
@@ -53,10 +134,10 @@ Fonts
 */
 
 body {
-  margin: .25rem .5rem;
+  margin: 0.25rem 0.5rem;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -122,7 +203,6 @@ Loading
   }
 }
 
-
 /*
 Main Layout
 */
@@ -144,8 +224,10 @@ Main Layout
 }
 
 .statusBox {
-  display: grid;
-  justify-items: center;
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
   padding-top: 1rem;
   padding-bottom: 3rem;
 }
@@ -153,10 +235,37 @@ Main Layout
 .statusLine {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  padding: .5rem;
+  grid-template-areas:
+    'streamer status'
+    'game game';
   border-top: 1px solid blue;
   border-left: 1px solid blue;
   border-right: 1px solid blue;
+}
+
+.statusLine > span {
+  padding: 0.5rem;
+}
+.statusLine .streamer {
+  grid-area: streamer;
+  text-align: left;
+}
+.statusLine .status {
+  grid-area: status;
+  display: flex;
+  justify-content: center;
+}
+.statusLine .channelInfo {
+  margin: 0.5rem 3rem;
+  grid-area: game;
+  display: grid;
+  grid-template-columns: 53px 1fr;
+}
+.statusLine .infoHeader {
+  font-weight: bold;
+}
+.statusLine .channelInfo > div {
+  margin-bottom: 10px;
 }
 
 .statusLine:last-child {
@@ -167,16 +276,13 @@ Main Layout
   background-color: #bcffbc;
 }
 
-.live, .offline {
-  display: flex;
-  justify-content: center;
+.statusLine.live .streamer {
+  font-weight: bold;
 }
-
-.live {
-  color:red;
+.statusLine.live .status {
+  color: red;
 }
-
-.offline {
+.statusLine.offline .status {
   color: gray;
 }
 
@@ -193,25 +299,20 @@ iframe {
   min-height: 300px;
 }
 
-
 /*
 Media Queries
 */
 
 @media (max-width: 869px) {
-
   .streams {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
     padding: 0 8rem;
   }
-
 }
 
 @media (max-width: 669px) {
-
   .streams {
     padding: 0;
   }
-
 }

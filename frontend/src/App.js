@@ -18,7 +18,7 @@ class App extends Component {
 
   getActiveStreamers = streamersLive => {
     return Object.keys(streamersLive).filter(d => {
-      return streamersLive[d]
+      return streamersLive[d].live === true
     })
   }
 

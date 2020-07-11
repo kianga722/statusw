@@ -98,8 +98,8 @@ const getOAuth = async () => {
 const streamerMap = {
   'AustinShow': 40197643,
   'AvoidingThePuddle': 23528098,
+  'CohhCarnage': 26610234,
   'EsfandTV': 38746172,
-  'fistpumpdude': 408754253,
   'fl0m': 25093116,
   'HasanAbi': 207813352,
   'LIRIK': 23161357,
@@ -108,21 +108,46 @@ const streamerMap = {
   'TwitchPresents': 149747285,
   'xQcOW': 71092938
 }
-// Prepare URL of streamers
-const streamersLower = Object.keys(streamerMap).map(d => d.toLowerCase())
-// Create Twitch URL query to append at end
-let streamersURL = 'streams?';
-streamersLower.map((s) => {
-  if (s === streamersLower[streamersLower.length - 1]) {
-    streamersURL += `user_login=${s}`;
-  } else {
-    streamersURL += `user_login=${s}&`;
-  }
-});
-// Streamer Info Request
+
+// Create end of Twitch URL query
+const createURLend = (queryName, paramKey, arrParamValues) => {
+  let end = `${queryName}?`;
+  arrParamValues.map(a => {
+    if (a === arrParamValues[arrParamValues.length - 1]) {
+      end += `${paramKey}=${a}`;
+    } else {
+      end += `${paramKey}=${a}&`;
+    }
+  });
+  return end;
+}
+
+
+// Prepare URL of streamers to get live status
+const streamersLowerCase = Object.keys(streamerMap).map(d => d.toLowerCase())
+const streamersURLend = createURLend('streams', 'user_login', streamersLowerCase)
+
+// Request to get live status of streamers
+// Only returns live streamers
 const streamerOptions = token => {
   return {
-    url: `https://api.twitch.tv/helix/${streamersURL}
+    url: `https://api.twitch.tv/helix/${streamersURLend}
+    `,
+    method: 'get',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Client-ID': clientId,
+      'Authorization': `Bearer ${token}`
+    },
+  }
+}
+// Channel Request to get stream game name and title
+// Returns data even if user is offline
+const channelOptions = (token, arrIDs) => {
+  const channelsURLend = createURLend('channels', 'broadcaster_id', arrIDs)
+  return {
+    url: `https://api.twitch.tv/helix/${channelsURLend}
     `,
     method: 'get',
     headers: {
@@ -136,19 +161,38 @@ const streamerOptions = token => {
 
 const getStreamers = async () => {
   try {
-    const twitchResponse = await axios(streamerOptions(tokenOAuth))
-    const streamers = Object.keys(streamerMap)
+    // Returns only live streamers
+    const liveResponse = await axios(streamerOptions(tokenOAuth))
 
-    // Initialize status hash and active array
+    const streamers = Object.keys(streamerMap)
+    // Prepare streamer obj to send back
     const streamersLive = {};
     streamers.map((s) => {
       // All streamers in hash set offline initially
       streamersLive[s] = false;
+      streamersLive[s] = {
+        live: false,
+        title: null,
+        game: null
+      }
     });
-    // Map online streamers status to true
-    twitchResponse.data.data.map(d => {
-      streamersLive[`${d.user_name}`] = true;
+
+    const liveIDs = [];
+    liveResponse.data.data.map(d => {
+      // Gather live IDs
+      liveIDs.push(d.user_id)
+      // Set live streamers in streamer obj
+      streamersLive[`${d.user_name}`].live = true;
     });
+
+    // Get channel info from live streamers
+    const infoResponse = await axios(channelOptions(tokenOAuth, liveIDs))
+    // Set channel title and game names
+    infoResponse.data.data.map(d => {
+      streamersLive[`${d.broadcaster_name}`].title = d.title;
+      streamersLive[`${d.broadcaster_name}`].game = d.game_name;
+    })
+    
     return {
       streamersLive,
     }

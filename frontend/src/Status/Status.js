@@ -14,16 +14,28 @@ class Status extends Component {
             {
               Object.keys(this.props.status).map((s) => (
                 <a key={s}
-                   className='statusLine'
+                  className={this.props.status[s].live ? 'statusLine live' : 'statusLine offline'}
                    href={`https://www.twitch.tv/${s}`}
                    target='_blank'
                    rel='noopener noreferrer'>
-                  <div className='streamer'>
+                  <span className='streamer'>
                     {s}
-                  </div>
-                  <span className={this.props.status[s] ? 'live' : 'offline'}>
-                    {this.props.status[s] ? 'LIVE' : 'Offline'}
                   </span>
+                  <span className='status'>
+                    {this.props.status[s].live ? 'LIVE' : 'Offline'}
+                  </span>
+                  {this.props.status[s].live &&
+                    <div className='channelInfo'>
+                      <div className='infoHeader'>Game</div>
+                      <div className='gameName'>
+                        {this.props.status[s].game}
+                      </div>
+                      <div className='infoHeader'>Title</div>
+                      <div className='channelTitle'>
+                        {this.props.status[s].title}
+                      </div>
+                    </div>
+                  }
                 </a>
               ))
             }
