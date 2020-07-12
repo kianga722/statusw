@@ -99,6 +99,7 @@ const streamerMap = {
   'AustinShow': 40197643,
   'AvoidingThePuddle': 23528098,
   'CohhCarnage': 26610234,
+  'DansGaming': 7236692,
   'EsfandTV': 38746172,
   'fl0m': 25093116,
   'HasanAbi': 207813352,
