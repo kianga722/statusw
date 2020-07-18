@@ -8,6 +8,10 @@ const path = require('path');
 const axios = require('axios');
 const socketIo = require('socket.io');
 
+// Get streamers from separate file
+const streamerMap = require('./streamers.json');
+
+
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
@@ -93,23 +97,6 @@ const getOAuth = async () => {
   } catch (error) {
     console.log(error)
   }
-}
-
-const streamerMap = {
-  'AustinShow': 40197643,
-  'AvoidingThePuddle': 23528098,
-  'CohhCarnage': 26610234,
-  'DansGaming': 7236692,
-  'EsfandTV': 38746172,
-  'fl0m': 25093116,
-  'HasanAbi': 207813352,
-  'LIRIK': 23161357,
-  'Leffen': 53831525,
-  'mang0': 26551727,
-  'Mizkif': 94753024,
-  'n0ne': 80615421,
-  'TwitchPresents': 149747285,
-  'xQcOW': 71092938
 }
 
 // Create end of Twitch URL query
