@@ -16,6 +16,7 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
 
+
 const port = process.env.PORT || 8081;
 
 // Twitch variables
