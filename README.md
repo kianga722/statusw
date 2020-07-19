@@ -1,4 +1,5 @@
 # statusW
+
 This project aims to display the online status of a selected subset of Twitch streamers
 
 [View App](https://statuspog.herokuapp.com/)
@@ -7,9 +8,9 @@ This project aims to display the online status of a selected subset of Twitch st
 
 ## Summary
 
-* Motivation was to develop skills using React, Express, and CSS Grid
-* App checks at regular intervals for online status of each streamer
+- App checks for the online status of streamers and uses webhooks to trigger live updates
+- Motivation was to develop skills in React, Express, and CSS Grid
 
 ## Future Improvements
 
-* Figure out faster way of dealing with iframe loading
+- Figure out more efficient way of dealing with iframe loading
