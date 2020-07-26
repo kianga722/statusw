@@ -21,6 +21,7 @@ class Streams extends Component {
                   <iframe
                     title={`${s}-iframe`}
                     src={`https://player.twitch.tv/?channel=${s}&parent=${parent}&autoplay=false`}
+                    loading="lazy"
                   >
                   </iframe>
                 </div>
