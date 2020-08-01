@@ -177,12 +177,15 @@ const getStreamers = async () => {
     });
 
     // Get channel info from live streamers
-    const infoResponse = await axios(channelOptions(tokenOAuth, liveIDs))
-    // Set channel title and game names
-    infoResponse.data.data.map(d => {
-      streamersLive[`${d.broadcaster_name}`].title = d.title;
-      streamersLive[`${d.broadcaster_name}`].game = d.game_name;
-    })
+    if (liveIDs.length > 0) {
+      const infoResponse = await axios(channelOptions(tokenOAuth, liveIDs))
+      // Set channel title and game names
+      infoResponse.data.data.map(d => {
+        streamersLive[`${d.broadcaster_name}`].title = d.title;
+        streamersLive[`${d.broadcaster_name}`].game = d.game_name;
+      })
+    }
+    
     
     return {
       streamersLive,
