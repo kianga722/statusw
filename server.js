@@ -30,20 +30,12 @@ const app = express();
 
 // Middleware for verifying Twitch webhook notifications
 app.use(bodyParser.json({
-  verify: function (req, res, buf, encoding) {
-    // is there a hub to verify against
-    req.twitch_hub = false;
-    if (req.headers && req.headers['x-hub-signature']) {
-      console.log('req headers', req.headers)
-      req.twitch_hub = true;
-
-      let xHub = req.headers['x-hub-signature'].split('=');
-
-      req.twitch_hex = crypto.createHmac(xHub[0], webhookSecret).update(buf).digest('hex')
-      req.twitch_signature = xHub[1]
-    }
+  verify: (req, res, buf) => {
+      // Small modification to the JSON bodyParser to expose the raw body in the request object
+      // The raw body is required at signature verification
+      req.rawBody = buf
   }
-}));
+}))
 
 // Prep WebSockets
 const server = http.createServer(app);
@@ -122,8 +114,7 @@ const streamersURLend = createURLend('streams', 'user_login', streamersLowerCase
 // Only returns live streamers
 const streamerOptions = token => {
   return {
-    url: `https://api.twitch.tv/helix/${streamersURLend}
-    `,
+    url: `https://api.twitch.tv/helix/${streamersURLend}`,
     method: 'get',
     headers: {
       'Accept': 'application/json',
@@ -138,8 +129,7 @@ const streamerOptions = token => {
 const channelOptions = (token, arrIDs) => {
   const channelsURLend = createURLend('channels', 'broadcaster_id', arrIDs)
   return {
-    url: `https://api.twitch.tv/helix/${channelsURLend}
-    `,
+    url: `https://api.twitch.tv/helix/${channelsURLend}`,
     method: 'get',
     headers: {
       'Accept': 'application/json',
@@ -177,12 +167,14 @@ const getStreamers = async () => {
     });
 
     // Get channel info from live streamers
-    const infoResponse = await axios(channelOptions(tokenOAuth, liveIDs))
-    // Set channel title and game names
-    infoResponse.data.data.map(d => {
-      streamersLive[`${d.broadcaster_name}`].title = d.title;
-      streamersLive[`${d.broadcaster_name}`].game = d.game_name;
-    })
+    if (liveIDs.length > 0) {
+      const infoResponse = await axios(channelOptions(tokenOAuth, liveIDs))
+      // Set channel title and game names
+      infoResponse.data.data.map(d => {
+        streamersLive[`${d.broadcaster_name}`].title = d.title;
+        streamersLive[`${d.broadcaster_name}`].game = d.game_name;
+      })
+    }
     
     return {
       streamersLive,
@@ -199,7 +191,7 @@ const getStreamers = async () => {
 // Current Subscriptions
 const currentSubOptions = (token) => {
   return {
-    url: 'https://api.twitch.tv/helix/webhooks/subscriptions',
+    url: 'https://api.twitch.tv/helix/eventsub/subscriptions',
     method: 'get',
     headers: {
       'Client-ID': clientId,
@@ -210,54 +202,71 @@ const currentSubOptions = (token) => {
 
 // Webhooks Subscriptions
 const webhookSubOptions = (token, userId, type) => {
-  return {
-    url: 'https://api.twitch.tv/helix/webhooks/hub',
-    method: 'post',
-    params: {
-      'hub.callback': `${process.env.WEBHOOK_CALLBACK_URL}/subResponse`,
-      'hub.mode': type,
-      'hub.topic': `https://api.twitch.tv/helix/streams?user_id=${userId}`,
-      'hub.lease_seconds': 86400,
-      'hub.secret': webhookSecret
+  // type is a string
+  // stream.online
+  // stream.offline
+
+  const objData = {
+    "type": type,
+    "version": "1",
+    "condition": {
+      "broadcaster_user_id": userId
     },
+    "transport": {
+      "method": "webhook",
+      "callback": `${process.env.WEBHOOK_CALLBACK_URL}/subResponse`,
+      "secret": webhookSecret
+    }
+  }
+
+  return {
+    url: 'https://api.twitch.tv/helix/eventsub/subscriptions',
+    method: 'post',
+    data: JSON.stringify(objData),
     headers: {
+      'Content-Type': 'application/json',
       'Client-ID': clientId,
       'Authorization': `Bearer ${token}`
     },
   }
 }
 
+
+// Webhooks Subscriptions
+const webhookSubDelete = (token, subId) => {
+  return {
+    url: `https://api.twitch.tv/helix/eventsub/subscriptions?id=${subId}`,
+    method: 'delete',
+    headers: {
+      'Content-Type': 'application/json',
+      'Client-ID': clientId,
+      'Authorization': `Bearer ${token}`
+    },
+  }
+}
+
+
 // Get all current subscriptions and find missing subs if there are less than the number in streamerMap
 const webhookSubBulk = async (type) => {
   const streamerIds = Object.values(streamerMap)
   // Get all current subs
   const currentSubs = await axios(currentSubOptions(tokenOAuth));
-  console.log('currentSubs', currentSubs.data)
-  // Check if less than total in streamerMap list
-  if (currentSubs.data.total < streamerIds.length) {
-    // Temp list for finding missing streamers
-    let streamerIdsLeft = [...streamerIds];
-    // For each streamer in returned data, verify callback URL and remove from temp list
-    for (let currentSub of currentSubs.data.data) {
-      // Verify callback
-      if (currentSub.callback === `${process.env.WEBHOOK_CALLBACK_URL}/subResponse`) {
-        const parsed = url.parse(currentSub.topic)
-        // Get Id and remove from temp list
-        const userId = parseInt(parsed.query.split('=')[1])
-        streamerIdsLeft = streamerIdsLeft.filter(s => {
-          return s !== userId
-        })
-      }
-    }
-    // For each streamer left in the list, sub
-    for (let userId of streamerIdsLeft) {
-      await axios(webhookSubOptions(tokenOAuth, userId, type))
-      console.log(`subbing to ${userId}`)
-    }
 
-    console.log('subbing complete')
-  } 
-  console.log('no subbing needed')
+  // Delete all subs first in case of notification_failures_exceeded error
+  if (currentSubs.data.total > 0) {
+    for (let sub of currentSubs.data.data) {
+      await axios(webhookSubDelete(tokenOAuth, sub.id))
+    }
+  }
+
+  // For each streamer left in the list, sub
+  for (let userId of streamerIds) {
+    await axios(webhookSubOptions(tokenOAuth, userId, 'stream.online'))
+    await axios(webhookSubOptions(tokenOAuth, userId, 'stream.offline'))
+    console.log(`subbing to ${userId}`)
+  }
+
+  console.log('subbing complete')
 }
 
 
@@ -302,32 +311,33 @@ app.get('/getStreamers', async (req, res) => {
   }
 })
 
-
-// Twitch sub topic response
-app.get('/subResponse', async (req, res) => {
-  const hubChallenge = req.query['hub.challenge'];
-  if (hubChallenge) {
-    console.log('echo hub challenge')
-    res.status(200).set('Content-Type', 'text/plain').send(hubChallenge)
-    return
-  }
-  res.status(500).send('Server Error')
-})
-
 // Twitch webhook notification 
-app.post('/subResponse', async (req, res) => {
-  res.status(200).end()
-  // Verify response is actually from Twitch
-  if (!req.twitch_hub || !req.twitch_hex === req.twitch_signature) {
-    return;
-  }
+function verifySignature(messageSignature, messageID, messageTimestamp, body) {
+  let message = messageID + messageTimestamp + body
+  let signature = crypto.createHmac('sha256', webhookSecret).update(message) // Remember to use the same secret set at creation
+  let expectedSignatureHeader = "sha256=" + signature.digest("hex")
 
-  // Handle notification
-  if (req.body.data.length === 0) {
-    console.log('received stream end webhook')
+  return expectedSignatureHeader === messageSignature
+}
+
+app.post('/subResponse', async (req, res) => {
+  if (!verifySignature(req.header("Twitch-Eventsub-Message-Signature"),
+    req.header("Twitch-Eventsub-Message-Id"),
+    req.header("Twitch-Eventsub-Message-Timestamp"),
+    req.rawBody)) {
+      res.status(403).send("Forbidden") // Reject requests with invalid signatures
   } else {
-    const user = req.body.data[0].user_name
-    console.log(`received stream change for user: ${user}`)
+    if (req.header("Twitch-Eventsub-Message-Type") === "webhook_callback_verification") {
+      console.log(req.body.challenge)
+      res.send(req.body.challenge) // Returning a 200 status with the received challenge to complete webhook creation flow
+    } else if (req.header("Twitch-Eventsub-Message-Type") === "notification") {
+      // Implement your own use case with the event data at this block
+      if (req.body.subscription && (req.body.subscription.type === 'stream.online' || req.body.subscription.type === 'stream.offline')) {
+        console.log(`received stream change type ${req.body.subscription.type} for user: ${req.body.event.broadcaster_user_name}`)
+      }
+
+      res.send("") // Default .send is a 200 status
+    }
   }
 
   if (numConnections > 0) {
